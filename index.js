@@ -22,6 +22,8 @@ async function run() {
   try {
     const serviceCollection = client.db("wildLife").collection("services");
     const reviewCollection = client.db("wildLife").collection("reviews");
+
+    //Services api
     app.get("/services", async (req, res) => {
       const query = {};
       const cursor = serviceCollection.find(query);
@@ -41,6 +43,12 @@ async function run() {
       const query = { _id: ObjectId(id) };
       const service = await serviceCollection.findOne(query);
       res.send(service);
+    });
+
+    app.post("/services", async (req, res) => {
+      const service = req.body;
+      const result = await serviceCollection.insertOne(service);
+      res.send(result);
     });
 
     //Reviews Api
