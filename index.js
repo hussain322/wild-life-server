@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const { query } = require("express");
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
@@ -28,18 +29,19 @@ async function run() {
       res.send(services);
     });
 
+    app.get("/services/limit", async (req, res) => {
+      const query = {};
+      const cursor = serviceCollection.find(query).limit(3);
+      const services = await cursor.toArray();
+      res.send(services);
+    });
+
     app.get("/services/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const service = await serviceCollection.findOne(query);
       res.send(service);
     });
-
-    // app.post("/services/limit", async (req, res) => {
-    //   const review = req.body;
-    //   const result = await reviewCollection.insertOne(review);
-    //   res.send(result);
-    // });
 
     //Reviews Api
     app.get("/reviews", async (req, res) => {
@@ -49,8 +51,8 @@ async function run() {
           email: req.query.email,
         };
       }
-      const option = { sort: { postTime: -1 } };
-      const cursor = reviewCollection.find(query, option);
+      const options = { sort: { createdTime: -1 } };
+      const cursor = reviewCollection.find(query, options);
       const reviews = await cursor.toArray();
       res.send(reviews);
     });
